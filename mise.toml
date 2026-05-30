@@ -1,0 +1,12 @@
+[tools]
+dotnet-core = "10.0.103"
+
+[tools."github:godotengine/godot"]
+
+version = "4.6.3-stable"
+rename_exe = "godot"
+
+[tools."github:godotengine/godot".platforms]
+
+windows-x86_64 = { asset_pattern = "*-stable_mono_win64.zip" }
+linux-x86_64 = { asset_pattern = "*-stable_mono_linux_x86_64.zip" }
