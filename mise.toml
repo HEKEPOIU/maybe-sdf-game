@@ -1,3 +1,5 @@
+[env]
+DOTNET_ROOT="path to `mise where dotnet-core`"
 [tools]
 dotnet-core = "10.0.103"
 
