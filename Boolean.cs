@@ -9,10 +9,12 @@ public partial class Boolean : Node2D
 
     public override void _Ready()
     {
-        polygons.Add(new(new Vector2(300, 300), MSGPolygon.GetCricle(10), [new Color("478cbf")]));
-        polygons.Add(new(new Vector2(350, 300), MSGPolygon.GetCricle(10), [new Color(1, 1, 1, 1)]));
+        polygons.Add(new(new Vector2(300, 300), MSGPolygon.GetCricle(50), [new Color("478cbf")]));
+        polygons.Add(new(new Vector2(350, 300), MSGPolygon.GetCricle(50), [new Color(1, 1, 1, 1)]));
+        polygons.Add(new(new Vector2(400, 300), MSGPolygon.GetCricle(50), [new Color(1, 0, 1, 1)]));
         polygons[0].Scale = new Vector2(100, 100);
         polygons[1].Scale = new Vector2(100, 100);
+        polygons[2].Scale = new Vector2(100, 100);
     }
 
 

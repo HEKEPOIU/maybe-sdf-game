@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://sl0peecxvi6l"]
+
+[ext_resource type="Texture2D" uid="uid://db5cajol3xaeu" path="res://icon.svg" id="1_r0mhq"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_gd8yt"]
+
+[node name="Node2D" type="Node2D" unique_id=726614474]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1251535826]
+position = Vector2(516, 618)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1718634798]
+shape = SubResource("WorldBoundaryShape2D_gd8yt")
+
+[node name="RigidBody2D" type="RigidBody2D" parent="." unique_id=603875853]
+position = Vector2(568, 265)
+rotation = -0.7853982
+
+[node name="Sprite2D" type="Sprite2D" parent="RigidBody2D" unique_id=569475519]
+texture = ExtResource("1_r0mhq")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="RigidBody2D" unique_id=1389173008]
+position = Vector2(0.47753382, -12.624588)
+rotation = -1.052666
+polygon = PackedVector2Array(12.472779, -76.845, -74.63141, 21.647888, -17.955536, 3.9888935, -42.860992, 87.37186, -25.93637, 89.932526, 70.95029, 31.443422, 45.48346, -23.223206)

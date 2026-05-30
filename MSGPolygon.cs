@@ -2,7 +2,6 @@
 using Godot;
 using GodotTool;
 
-
 namespace MSG;
 
 class MSGPolygon(Vector2 position, Vector2[] shape, Color[] color)
@@ -54,6 +53,5 @@ class MSGPolygon(Vector2 position, Vector2[] shape, Color[] color)
         }
 
         return result;
-
     }
 }
