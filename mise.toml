@@ -1,5 +1,6 @@
 [env]
-DOTNET_ROOT="path to `mise where dotnet-core`"
+DOTNET_ROOT="/home/hekpoiu/.local/share/mise/installs/dotnet-core/10.0.103"
+
 [tools]
 dotnet-core = "10.0.103"
 
