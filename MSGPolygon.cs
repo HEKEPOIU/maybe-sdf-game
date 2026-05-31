@@ -7,6 +7,7 @@ using GodotTool;
 namespace MSG;
 
 public class MSGPolygon(Vector2[] shape)
+
 {
 	static public Dictionary<int, Vector2[]> CricleCache = [];
 	public Vector2 Position = default;
@@ -38,7 +39,7 @@ public class MSGPolygon(Vector2[] shape)
 	public static MSGPolygon FromTransformedShape(Vector2[] ts)
 	{
 		var position = ts.CountAabb().GetCenter();
-		var trans = new Transform2D(1, new(1, 1), 0, position);
+		var trans = new Transform2D(0, new(1, 1), 0, position);
 		return new(trans.Inverse() * ts)
 		{
 			Position = position,
