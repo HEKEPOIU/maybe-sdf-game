@@ -70,6 +70,14 @@ public partial class Boolean : Node2D
 		var origin_r = inputPolygons[PolygonsColor.Red].Select(p => p.TransformedShape).ToArray();
 		var origin_g = inputPolygons[PolygonsColor.Green].Select(p => p.TransformedShape).ToArray();
 		var origin_b = inputPolygons[PolygonsColor.Blue].Select(p => p.TransformedShape).ToArray();
+		var origin_c = inputPolygons[PolygonsColor.Cyan].Select(p => p.TransformedShape).ToArray();
+		var origin_m = inputPolygons[PolygonsColor.Magenta].Select(p => p.TransformedShape).ToArray();
+		var origin_y = inputPolygons[PolygonsColor.Yellw].Select(p => p.TransformedShape).ToArray();
+		var origin_w = inputPolygons[PolygonsColor.White].Select(p => p.TransformedShape).ToArray();
+		origin_r = Concat(origin_r, origin_y, origin_m, origin_w);
+		origin_g = Concat(origin_g, origin_y, origin_c, origin_w);
+		origin_b = Concat(origin_b, origin_m, origin_c, origin_w);
+
 		var yellow = ResolveIntersect(origin_r, origin_g);
 		var magenta = ResolveIntersect(origin_r, origin_b);
 		var cyan = ResolveIntersect(origin_g, origin_b);
@@ -148,7 +156,7 @@ public partial class Boolean : Node2D
 		{
 			if (MSGPolygon.IsIntersects(preview_polygon, resolvePolygons[current_preview_color].AsSpan()))
 			{
-				
+
 				GD.Print($"Can't overlay same color polygon: {current_preview_color}");
 				return;
 			}
