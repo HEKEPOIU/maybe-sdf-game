@@ -7,7 +7,7 @@ namespace GodotTool;
 public static class Geometry2DExtension
 {
 
-    public static List<Vector2[]> MergeAll(this Vector2[][] polygons)
+    public static Vector2[][] MergeAll(this Vector2[][] polygons)
     {
         var current = polygons.ToList();
 
@@ -31,7 +31,7 @@ public static class Geometry2DExtension
             }
         } while (anyMerged);
 
-        return current;
+        return [.. current];
     }
 
     public static Rect2 CountAabb(this Vector2[] c)

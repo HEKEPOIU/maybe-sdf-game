@@ -73,7 +73,7 @@ public class MSGPolygon(Vector2[] shape)
 			return value;
 		}
 
-		var result = new Vector2[side + 1];
+		var result = new Vector2[side];
 		var startAngle = -Mathf.Pi / 2;
 
 		for (int i = 0; i < side; i++)
@@ -81,7 +81,6 @@ public class MSGPolygon(Vector2[] shape)
 			var currentAngle = startAngle + 2 * Mathf.Pi / side * i;
 			result[i] = new Vector2(0 + 1 * Mathf.Cos(currentAngle), 0 + 1 * Mathf.Sin(currentAngle));
 		}
-		result[^1] = result[0];
 		CricleCache[side] = result;
 
 		return result;

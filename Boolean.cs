@@ -44,7 +44,7 @@ public partial class Boolean : Node2D
 		{PolygonsColor.White, new(30)},
 	};
 
-	private readonly MSGPolygon preview_polygon = new(MSGPolygon.GetCricle(50));
+	private readonly MSGPolygon preview_polygon = new(MSGPolygon.GetCricle(10));
 	private PolygonsColor current_preview_color;
 
 	public override void _Ready()
@@ -58,7 +58,8 @@ public partial class Boolean : Node2D
 		{
 			foreach (var poly in v)
 			{
-				DrawColoredPolygon(poly.TransformedShape, colorConfig[k], null, null);
+				var shape = poly.TransformedShape;
+				DrawColoredPolygon(shape, colorConfig[k], null, null);
 			}
 		}
 
@@ -74,9 +75,10 @@ public partial class Boolean : Node2D
 		var origin_m = inputPolygons[PolygonsColor.Magenta].Select(p => p.TransformedShape).ToArray();
 		var origin_y = inputPolygons[PolygonsColor.Yellw].Select(p => p.TransformedShape).ToArray();
 		var origin_w = inputPolygons[PolygonsColor.White].Select(p => p.TransformedShape).ToArray();
-		origin_r = Concat(origin_r, origin_y, origin_m, origin_w);
-		origin_g = Concat(origin_g, origin_y, origin_c, origin_w);
-		origin_b = Concat(origin_b, origin_m, origin_c, origin_w);
+
+		origin_r = Concat(origin_r, origin_y, origin_m, origin_w).MergeAll();
+		origin_g = Concat(origin_g, origin_y, origin_c, origin_w).MergeAll();
+		origin_b = Concat(origin_b, origin_m, origin_c, origin_w).MergeAll();
 
 		var yellow = ResolveIntersect(origin_r, origin_g);
 		var magenta = ResolveIntersect(origin_r, origin_b);
@@ -84,13 +86,14 @@ public partial class Boolean : Node2D
 
 		var white = ResolveIntersect(yellow, origin_b);
 
+		var yellow_only = ResolveClip(yellow, white);
+		var magenta_only = ResolveClip(magenta, white);
+		var cyan_only = ResolveClip(cyan, white);
+
 		var red_only = ResolveClip(origin_r, Concat(yellow, magenta));
 		var green_only = ResolveClip(origin_g, Concat(cyan, yellow));
 		var blue_only = ResolveClip(origin_b, Concat(cyan, magenta));
 
-		var yellow_only = ResolveClip(yellow, white);
-		var magenta_only = ResolveClip(magenta, white);
-		var cyan_only = ResolveClip(cyan, white);
 
 
 		foreach (var (k, v) in resolvePolygons)
@@ -108,8 +111,55 @@ public partial class Boolean : Node2D
 			};
 			if (current == null) continue;
 			v.Clear();
-			v.AddRange(current.Select(MSGPolygon.FromTransformedShape));
+			v.AddRange(current.MergeAll().Where(p => IsValidPolygon(p, k)).Select(MSGPolygon.FromTransformedShape));
 		}
+	}
+	private static bool IsSelfIntersecting(Vector2[] poly)
+	{
+		int n = poly.Length;
+		for (int i = 0; i < n; i++)
+		{
+			Vector2 a1 = poly[i];
+			Vector2 a2 = poly[(i + 1) % n];
+
+			for (int j = i + 2; j < n; j++)
+			{
+				if (i == 0 && j == n - 1) continue;
+
+				Vector2 b1 = poly[j];
+				Vector2 b2 = poly[(j + 1) % n];
+
+				Variant intersect = Geometry2D.SegmentIntersectsSegment(a1, a2, b1, b2);
+				if (intersect.Obj != null)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	private static bool IsValidPolygon(Vector2[] p, PolygonsColor c)
+	{
+		if (p.Length < 3)
+		{
+			GD.Print($"polygon length <3 invalid ");
+			return false;
+		}
+		if (MSGPolygon.ShoelaceArea(p) is var size && size == 0)
+		{
+			GD.Print($"Polygons Size {size} < 0.5 invalid");
+			return false;
+		}
+		var tri = Geometry2D.TriangulatePolygon(p);
+		if (tri.Length == 0)
+		{
+			GD.Print($"Failed to Triangulate {c} poly");
+			if (IsSelfIntersecting(p))
+			{
+				GD.Print($"Is Self Intersect");
+			}
+		}
+		return tri.Length != 0;
 	}
 
 	private Vector2[][] Concat(params Vector2[][][] lists)
@@ -162,6 +212,7 @@ public partial class Boolean : Node2D
 			}
 			inputPolygons[current_preview_color].Add(new(preview_polygon));
 			SolveScene();
+			QueueRedraw();
 		}
 
 		var colorChangeDir = 0;
