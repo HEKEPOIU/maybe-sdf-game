@@ -1,8 +1,5 @@
-[env]
-DOTNET_ROOT="/home/hekpoiu/.local/share/mise/installs/dotnet-core/10.0.103"
-
 [tools]
-dotnet-core = "10.0.103"
+dotnet = "10.0.103"
 
 [tools."github:godotengine/godot"]
 

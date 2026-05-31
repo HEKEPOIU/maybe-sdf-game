@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GodotTool;
 
@@ -15,6 +16,14 @@ public class UnstableFixedArray<T>(int capacity) : IEnumerable<T>
 		if (Count >= array.Length) throw new IndexOutOfRangeException();
 		array[Count] = item;
 		Count++;
+	}
+
+	public void AddRange(IEnumerable<T> items)
+	{
+		foreach (var i in items)
+		{
+			Add(i);
+		}
 	}
 
 	public void RemoveAll<Child>() where Child : T
@@ -33,7 +42,7 @@ public class UnstableFixedArray<T>(int capacity) : IEnumerable<T>
 
 	public void RemoveByIndex(int i)
 	{
-		(array[i], array[Count-1]) = (array[Count-1], array[i]);
+		(array[i], array[Count - 1]) = (array[Count - 1], array[i]);
 		Count--;
 	}
 
@@ -42,6 +51,7 @@ public class UnstableFixedArray<T>(int capacity) : IEnumerable<T>
 		Count = 0;
 	}
 
+    public Span<T> AsSpan() => array.AsSpan(0, Count);
 	public IEnumerator<T> GetEnumerator()
 	{
 		for (int i = 0; i < Count; i++)

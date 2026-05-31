@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using GodotTool;
 
@@ -5,62 +7,93 @@ namespace MSG;
 
 public partial class Boolean : Node2D
 {
-    UnstableFixedArray<MSGPolygon> polygons = new(3);
+    enum PolygonsColor
+    {
+        Red,
+        Green,
+        Blue,
+        Cyan,
+        Magenta,
+        Yellw,
+        White,
+
+        MAXCOUNT,
+    }
+    [Export] private Godot.Collections.Dictionary<PolygonsColor, Color> colorConfig { get; set; } = [];
+    [Export] private float preview_line_width = 2;
+    private readonly Dictionary<PolygonsColor, UnstableFixedArray<MSGPolygon>> polygons = new()
+    {
+        {PolygonsColor.Red, new(30)},
+        {PolygonsColor.Green, new(30)},
+        {PolygonsColor.Blue, new(30)},
+        {PolygonsColor.Cyan, new(30)},
+        {PolygonsColor.Magenta, new(30)},
+        {PolygonsColor.Yellw, new(30)},
+        {PolygonsColor.White, new(30)},
+    };
+    private readonly MSGPolygon preview_polygon = new(MSGPolygon.GetCricle(50));
+    private PolygonsColor current_preview_color;
 
     public override void _Ready()
     {
-        polygons.Add(new(new Vector2(300, 300), MSGPolygon.GetCricle(50), [new Color("478cbf")]));
-        polygons.Add(new(new Vector2(350, 300), MSGPolygon.GetCricle(50), [new Color(1, 1, 1, 1)]));
-        polygons.Add(new(new Vector2(400, 300), MSGPolygon.GetCricle(50), [new Color(1, 0, 1, 1)]));
-        polygons[0].Scale = new Vector2(100, 100);
-        polygons[1].Scale = new Vector2(100, 100);
-        polygons[2].Scale = new Vector2(100, 100);
+        preview_polygon.Scale = new(100, 100);
     }
-
 
     public override void _Draw()
     {
-        // var pos = new Vector2(300, 300);
-        // DrawCircle(pos, 30, Color.Color8(255, 255, 255), antialiased: true);
-
-        foreach (var poly in polygons)
+        foreach (var (k, v) in polygons)
         {
-            DrawPolygon(poly.TransformedShape, poly.Color);
+            var shapes = v.Select(p => p.TransformedShape).ToArray();
+            var merge = shapes.MergeAll();
+            v.Clear();
+            foreach (var poly in merge)
+            {
+                v.Add(new(poly));
+            }
         }
-        var cricle = polygons[0].TransformedShape;
-        var cricle2 = polygons[1].TransformedShape;
 
-        var result = Geometry2D.IntersectPolygons(cricle, cricle2);
-
-        for (var i = 0; i < result.Count; i++)
+        foreach (var (k, v) in polygons)
         {
-            GD.Print($"Size of intersect {i}: {ShoelaceArea(result[i])}");
-            DrawPolygon(result[i], [Color.FromHsv(0.5f, 0.3f + i * 0.1f, 1)]);
+            foreach (var poly in v)
+            {
+                DrawColoredPolygon(poly.TransformedShape, colorConfig[k], null, null);
+            }
         }
+
+        DrawPolyline(preview_polygon.TransformedShape, colorConfig[current_preview_color].Lerp(new(1, 1, 1, 0), 0.5f), preview_line_width, true);
     }
     public override void _PhysicsProcess(double delta)
     {
         QueueRedraw();
     }
 
+
     public override void _Process(double delta)
     {
         var pos = GetGlobalMousePosition();
-
-        polygons[0].Position = pos;
-    }
-
-    private static float ShoelaceArea(Vector2[] polygon)
-    {
-        var size = polygon.Length;
-        float area = 0;
-        for (var i = 0; i < size; i++)
+        preview_polygon.Position = pos;
+        if (Input.IsActionJustPressed(ProjectInput.PUT_POLYGON))
         {
-            var j = (i + 1) % size;
-            area += polygon[i].X * polygon[j].Y;
-            area -= polygon[j].X * polygon[i].Y;
+            if (MSGPolygon.IsIntersects(preview_polygon, polygons[current_preview_color].AsSpan()))
+            {
+                GD.Print($"Can't overlay same color polygon");
+                return;
+            }
+            polygons[current_preview_color].Add(new(preview_polygon));
         }
-        return Mathf.Abs(area / 2);
+
+        var colorChangeDir = 0;
+        if (Input.IsActionJustPressed(ProjectInput.CHANGE_COLOR_NEXT))
+        {
+            colorChangeDir = 1;
+        }
+        else if (Input.IsActionJustPressed(ProjectInput.CHANGE_COLOR_PREV))
+        {
+            colorChangeDir = -1;
+        }
+        var max = (int)PolygonsColor.MAXCOUNT;
+        current_preview_color = (PolygonsColor)(((int)current_preview_color + colorChangeDir % max + max) % max);
+
     }
 
 }
