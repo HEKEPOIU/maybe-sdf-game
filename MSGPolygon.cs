@@ -7,7 +7,6 @@ using GodotTool;
 namespace MSG;
 
 public class MSGPolygon(Vector2[] shape)
-
 {
 	static public Dictionary<int, Vector2[]> CricleCache = [];
 	public Vector2 Position = default;
@@ -67,7 +66,7 @@ public class MSGPolygon(Vector2[] shape)
 
 	public static Vector2[] GetCricle(int side)
 	{
-		Debug.Assert(side >= 2);
+		Debug.Assert(side >= 3);
 		if (CricleCache.TryGetValue(side, out var value))
 		{
 			return value;
